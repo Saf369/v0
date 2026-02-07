@@ -53,6 +53,12 @@ const databases: DatabaseCategory[] = [
         description: 'Serverless NoSQL by AWS',
         link: 'https://docs.aws.amazon.com/dynamodb/',
       },
+      {
+        id: 'firestore',
+        name: 'Firestore',
+        description: 'Google Firebase real-time database',
+        link: 'https://firebase.google.com/docs/firestore',
+      },
     ],
   },
   {
@@ -147,44 +153,86 @@ const authentication: Option[] = [
     description: 'Passwordless authentication via email/SMS.',
     link: 'https://auth0.com/docs/authenticate/passwordless',
   },
-];
-
-const stacks: Option[] = [
   {
-    id: 'nextjs-node',
-    name: 'Next.js + Node.js',
-    description: 'Modern full-stack with frontend and backend.',
-    link: 'https://nextjs.org/docs',
+    id: 'firebase-auth',
+    name: 'Firebase Auth',
+    description: 'Google Firebase authentication service.',
+    link: 'https://firebase.google.com/docs/auth',
   },
   {
-    id: 'mern',
-    name: 'MERN Stack',
-    description: 'MongoDB, Express, React, Node.js.',
-    link: 'https://www.mongodb.com/mern-stack',
+    id: 'supabase-auth',
+    name: 'Supabase Auth',
+    description: 'Auth built into Supabase (PostgreSQL-based).',
+    link: 'https://supabase.com/docs/guides/auth',
+  },
+];
+
+const backends: Option[] = [
+  {
+    id: 'nodejs-express',
+    name: 'Node.js (Express / API routes)',
+    description: 'Full control backend using JavaScript.',
+    link: 'https://nodejs.org/en/docs/',
   },
   {
     id: 'django',
     name: 'Django',
-    description: 'Python framework with batteries included.',
+    description: 'Python backend with many features built in.',
     link: 'https://docs.djangoproject.com/',
   },
   {
-    id: 'springboot',
-    name: 'Spring Boot',
-    description: 'Java-based framework for production apps.',
-    link: 'https://spring.io/projects/spring-boot',
+    id: 'firebase',
+    name: 'Firebase',
+    description: "Google's backend platform with auth, database, and hosting.",
+    link: 'https://firebase.google.com/docs',
+  },
+  {
+    id: 'supabase',
+    name: 'Supabase',
+    description: 'Open-source Firebase alternative built on PostgreSQL.',
+    link: 'https://supabase.com/docs',
   },
 ];
 
 export default function OnboardingPlatform() {
   const [viewMode, setViewMode] = useState<ViewMode>('selection');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
-  const [selectedStack, setSelectedStack] = useState<string>('');
+  const [selectedBackend, setSelectedBackend] = useState<string>('');
   const [selectedDatabase, setSelectedDatabase] = useState<string>('');
   const [selectedAuth, setSelectedAuth] = useState<string>('');
 
+  // Handle auto-selection based on backend/auth compatibility
+  const handleBackendChange = (backendId: string) => {
+    setSelectedBackend(backendId);
+    // Auto-set database for BaaS options
+    if (backendId === 'firebase') {
+      setSelectedDatabase('firestore');
+    } else if (backendId === 'supabase') {
+      setSelectedDatabase('postgres');
+    }
+  };
+
+  const handleAuthChange = (authId: string) => {
+    setSelectedAuth(authId);
+    // Auto-set backend if using specific auth
+    if (authId === 'firebase-auth' && !selectedBackend) {
+      setSelectedBackend('firebase');
+      setSelectedDatabase('firestore');
+    } else if (authId === 'supabase-auth' && !selectedBackend) {
+      setSelectedBackend('supabase');
+      setSelectedDatabase('postgres');
+    }
+  };
+
+  const handleUseDefaults = () => {
+    setSelectedLanguage('typescript');
+    setSelectedBackend('supabase');
+    setSelectedDatabase('postgres');
+    setSelectedAuth('supabase-auth');
+  };
+
   const handleStartBuilding = () => {
-    if (selectedLanguage && selectedStack && selectedDatabase && selectedAuth) {
+    if (selectedLanguage && selectedBackend && selectedDatabase && selectedAuth) {
       setViewMode('commands');
     }
   };
@@ -193,13 +241,13 @@ export default function OnboardingPlatform() {
     setViewMode('selection');
   };
 
-  const isReady = selectedLanguage && selectedStack && selectedDatabase && selectedAuth;
+  const isReady = selectedLanguage && selectedBackend && selectedDatabase && selectedAuth;
 
   if (viewMode === 'commands') {
     return (
       <CommandOutput
         language={selectedLanguage}
-        stack={selectedStack}
+        backend={selectedBackend}
         database={selectedDatabase}
         auth={selectedAuth}
         onBack={handleBackToSelection}
@@ -230,12 +278,12 @@ export default function OnboardingPlatform() {
             onSelect={setSelectedLanguage}
           />
 
-          {/* Stacks */}
+          {/* Backend */}
           <SelectionSection
-            title="Tech Stack"
-            items={stacks}
-            selected={selectedStack}
-            onSelect={setSelectedStack}
+            title="How your app's backend works"
+            items={backends}
+            selected={selectedBackend}
+            onSelect={handleBackendChange}
           />
 
           {/* Authentication */}
@@ -243,7 +291,7 @@ export default function OnboardingPlatform() {
             title="Authentication"
             items={authentication}
             selected={selectedAuth}
-            onSelect={setSelectedAuth}
+            onSelect={handleAuthChange}
           />
 
           {/* Databases */}
@@ -267,6 +315,10 @@ export default function OnboardingPlatform() {
                         option={db}
                         selected={selectedDatabase === db.id}
                         onSelect={() => setSelectedDatabase(db.id)}
+                        disabled={
+                          (selectedBackend === 'firebase' && db.id !== 'firestore') ||
+                          (selectedBackend === 'supabase' && db.id !== 'postgres')
+                        }
                       />
                     ))}
                   </div>
@@ -278,13 +330,21 @@ export default function OnboardingPlatform() {
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-4">
-          <Button
-            onClick={handleStartBuilding}
-            disabled={!isReady}
-            className="h-12 px-8 text-base font-semibold"
-          >
-            Start Building
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={handleUseDefaults}
+              className="h-12 px-8 text-base font-semibold bg-accent hover:bg-accent/90 text-accent-foreground"
+            >
+              Use recommended defaults
+            </Button>
+            <Button
+              onClick={handleStartBuilding}
+              disabled={!isReady}
+              className="h-12 px-8 text-base font-semibold"
+            >
+              Start Building
+            </Button>
+          </div>
           {!isReady && (
             <p className="text-sm text-muted">
               Select one option from each category to continue
@@ -342,18 +402,23 @@ function SelectableCard({
   option,
   selected,
   onSelect,
+  disabled = false,
 }: {
   option: Option;
   selected: boolean;
   onSelect: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onSelect}
+      disabled={disabled}
       className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-        selected
-          ? 'border-primary bg-primary/10'
-          : 'border-border bg-card hover:border-primary/50'
+        disabled
+          ? 'border-border bg-card/50 opacity-50 cursor-not-allowed'
+          : selected
+            ? 'border-primary bg-primary/10'
+            : 'border-border bg-card hover:border-primary/50'
       }`}
     >
       <h3 className="font-semibold text-foreground mb-1">{option.name}</h3>

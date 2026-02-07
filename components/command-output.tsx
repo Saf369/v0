@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 
 interface CommandOutputProps {
   language: string;
-  stack: string;
+  backend: string;
   database: string;
   auth: string;
   onBack: () => void;
@@ -20,17 +20,18 @@ interface Tab {
 
 export default function CommandOutput({
   language,
-  stack,
+  backend,
   database,
   auth,
   onBack,
 }: CommandOutputProps) {
-  const [activeTab, setActiveTab] = useState<string>('project');
+  const [activeTab, setActiveTab] = useState<string>('frontend');
   const [copied, setCopied] = useState<string | null>(null);
 
   const getTabs = (): Tab[] => {
     const getLangName = (langId: string) => {
       const langMap: Record<string, string> = {
+        typescript: 'TypeScript',
         javascript: 'JavaScript',
         python: 'Python',
         go: 'Go',
@@ -39,14 +40,14 @@ export default function CommandOutput({
       return langMap[langId] || 'JavaScript';
     };
 
-    const getStackName = (stackId: string) => {
-      const stackMap: Record<string, string> = {
-        'nextjs-node': 'Next.js + Node.js',
-        mern: 'MERN',
+    const getBackendName = (backendId: string) => {
+      const backendMap: Record<string, string> = {
+        'nodejs-express': 'Node.js Express',
         django: 'Django',
-        springboot: 'Spring Boot',
+        firebase: 'Firebase',
+        supabase: 'Supabase',
       };
-      return stackMap[stackId] || 'Next.js + Node.js';
+      return backendMap[backendId] || 'Node.js Express';
     };
 
     const getDbName = (dbId: string) => {
@@ -55,6 +56,7 @@ export default function CommandOutput({
         mysql: 'MySQL',
         mongodb: 'MongoDB',
         dynamodb: 'DynamoDB',
+        firestore: 'Firestore',
         redis: 'Redis',
         sqlite: 'SQLite',
         influxdb: 'InfluxDB',
@@ -68,58 +70,109 @@ export default function CommandOutput({
         jwt: 'JWT',
         oauth: 'OAuth',
         otp: 'OTP',
+        'firebase-auth': 'Firebase Auth',
+        'supabase-auth': 'Supabase Auth',
       };
       return authMap[authId] || 'JWT';
     };
 
     return [
       {
-        id: 'project',
-        label: 'Project Setup',
+        id: 'frontend',
+        label: 'Frontend Setup',
         commands: [
-          `mkdir my-app && cd my-app`,
-          `npm init -y`,
-          `npm install ${stack === 'nextjs-node' ? 'next react react-dom' : stack === 'mern' ? 'express react react-dom' : stack === 'django' ? 'django' : 'gradle'}`,
+          `npx create-next-app@latest my-app --typescript`,
+          `cd my-app`,
+          `npm install`,
         ],
       },
       {
         id: 'backend',
         label: 'Backend Setup',
-        commands: [
-          `# Initialize ${getStackName(stack)} backend`,
-          `npm install dotenv cors express`,
-          `echo "BACKEND_PORT=3001" > .env`,
-        ],
+        commands:
+          backend === 'firebase'
+            ? [
+                `npm install firebase firebase-admin`,
+                `echo "NEXT_PUBLIC_FIREBASE_API_KEY=your_key" > .env.local`,
+                `# Follow Firebase setup at https://firebase.google.com/docs`,
+              ]
+            : backend === 'supabase'
+              ? [
+                  `npm install @supabase/supabase-js`,
+                  `echo "NEXT_PUBLIC_SUPABASE_URL=your_url" > .env.local`,
+                  `echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key" >> .env.local`,
+                ]
+              : backend === 'nodejs-express'
+                ? [
+                    `npm install express cors dotenv`,
+                    `mkdir -p server && cd server`,
+                    `npm init -y && npm install express`,
+                  ]
+                : [
+                    `pip install django djangorestframework`,
+                    `django-admin startproject myproject`,
+                    `cd myproject && python manage.py startapp api`,
+                  ],
       },
       {
         id: 'database',
         label: 'Database Setup',
-        commands: [
-          `# Install ${getDbName(database)} driver`,
+        commands:
           database === 'postgres'
-            ? `npm install pg`
+            ? [
+                `npm install pg`,
+                `# Set up PostgreSQL connection in .env`,
+                `echo "DATABASE_URL=postgresql://user:pass@localhost/dbname" >> .env.local`,
+              ]
             : database === 'mongodb'
-              ? `npm install mongodb`
+              ? [
+                  `npm install mongodb`,
+                  `echo "MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname" >> .env.local`,
+                ]
               : database === 'sqlite'
-                ? `npm install sqlite3`
-                : `npm install redis`,
-          `# Initialize database connection`,
-          `touch db-config.js`,
-        ],
+                ? [
+                    `npm install better-sqlite3`,
+                    `touch database.db`,
+                  ]
+                : database === 'firestore'
+                  ? [
+                      `# Firestore is included with Firebase`,
+                      `npm install firebase`,
+                    ]
+                  : [
+                      `npm install ${getDbName(database).toLowerCase()}`,
+                      `# Follow driver setup for ${getDbName(database)}`,
+                    ],
       },
       {
         id: 'auth',
         label: 'Auth Setup',
-        commands: [
-          `# Install ${getAuthName(auth)} packages`,
+        commands:
           auth === 'jwt'
-            ? `npm install jsonwebtoken bcryptjs`
+            ? [
+                `npm install jsonwebtoken bcryptjs`,
+                `touch lib/auth.ts`,
+                `# Implement JWT middleware in your backend`,
+              ]
             : auth === 'oauth'
-              ? `npm install passport passport-google-oauth20`
-              : `npm install otp-generator`,
-          `# Create auth middleware`,
-          `touch middleware/auth.js`,
-        ],
+              ? [
+                  `npm install next-auth`,
+                  `# Follow NextAuth.js setup at https://next-auth.js.org`,
+                ]
+              : auth === 'firebase-auth'
+                ? [
+                    `npm install firebase`,
+                    `# Firebase Auth is ready to use with your backend`,
+                  ]
+                : auth === 'supabase-auth'
+                  ? [
+                      `npm install @supabase/supabase-js`,
+                      `# Supabase Auth is included with Supabase client`,
+                    ]
+                  : [
+                      `npm install otp-generator`,
+                      `# Implement OTP logic in your backend`,
+                    ],
       },
     ];
   };
@@ -201,8 +254,8 @@ export default function CommandOutput({
               <p className="font-medium text-foreground">{language}</p>
             </div>
             <div>
-              <p className="text-xs text-muted uppercase mb-1">Stack</p>
-              <p className="font-medium text-foreground">{stack}</p>
+              <p className="text-xs text-muted uppercase mb-1">Backend</p>
+              <p className="font-medium text-foreground">{backend}</p>
             </div>
             <div>
               <p className="text-xs text-muted uppercase mb-1">Database</p>

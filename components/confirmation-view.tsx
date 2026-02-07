@@ -10,6 +10,7 @@ export default function ConfirmationView({
   onBackToLanding: () => void;
 }) {
   const defaultConfig = {
+    language: 'JavaScript',
     stack: 'Next.js + Node.js',
     database: 'PostgreSQL',
     authentication: 'JWT',
@@ -39,8 +40,8 @@ export default function ConfirmationView({
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
           You're all set!
         </h1>
-        <p className="text-lg text-muted leading-relaxed mb-2">
-          We picked a simple, popular setup that many developers start with.
+        <p className="text-lg text-muted leading-relaxed mb-4">
+          We've picked a popular and beginner-friendly setup used by many developers.
         </p>
         <p className="text-base text-muted">
           Here's what you'll be using to build:
@@ -48,38 +49,47 @@ export default function ConfirmationView({
       </div>
 
       {/* Config Display */}
-      <Card className="max-w-md w-full p-6 bg-secondary border-border mb-8">
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm font-semibold text-muted uppercase tracking-wide mb-1">
-              Tech Stack
-            </p>
-            <p className="text-lg font-semibold text-foreground">
-              {defaultConfig.stack}
-            </p>
-          </div>
+      <Card className="max-w-md w-full p-6 bg-card border-border mb-8 space-y-4">
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Language
+          </p>
+          <p className="text-lg font-semibold text-foreground">
+            {defaultConfig.language}
+          </p>
+        </div>
 
-          <Separator />
+        <Separator />
 
-          <div>
-            <p className="text-sm font-semibold text-muted uppercase tracking-wide mb-1">
-              Database
-            </p>
-            <p className="text-lg font-semibold text-foreground">
-              {defaultConfig.database}
-            </p>
-          </div>
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Tech Stack
+          </p>
+          <p className="text-lg font-semibold text-foreground">
+            {defaultConfig.stack}
+          </p>
+        </div>
 
-          <Separator />
+        <Separator />
 
-          <div>
-            <p className="text-sm font-semibold text-muted uppercase tracking-wide mb-1">
-              Authentication
-            </p>
-            <p className="text-lg font-semibold text-foreground">
-              {defaultConfig.authentication}
-            </p>
-          </div>
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Database
+          </p>
+          <p className="text-lg font-semibold text-foreground">
+            {defaultConfig.database}
+          </p>
+        </div>
+
+        <Separator />
+
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Authentication
+          </p>
+          <p className="text-lg font-semibold text-foreground">
+            {defaultConfig.authentication}
+          </p>
         </div>
       </Card>
 

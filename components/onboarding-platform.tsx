@@ -36,16 +36,34 @@ const databases: DatabaseCategory[] = [
         description: 'Popular, stable, beginner-friendly',
         link: 'https://dev.mysql.com/doc/',
       },
+      {
+        id: 'mariadb',
+        name: 'MariaDB',
+        description: 'MySQL-compatible open source alternative',
+        link: 'https://mariadb.org/documentation/',
+      },
+      {
+        id: 'oracle',
+        name: 'Oracle Database',
+        description: 'Enterprise-grade relational database',
+        link: 'https://docs.oracle.com/en/database/',
+      },
     ],
   },
   {
-    category: 'NoSQL',
+    category: 'NoSQL (Document / Key-Value)',
     items: [
       {
         id: 'mongodb',
         name: 'MongoDB',
         description: 'Flexible, JSON-like data storage',
         link: 'https://www.mongodb.com/docs/',
+      },
+      {
+        id: 'couchdb',
+        name: 'CouchDB',
+        description: 'Document database with sync capabilities',
+        link: 'https://docs.couchdb.org/',
       },
       {
         id: 'dynamodb',
@@ -62,7 +80,7 @@ const databases: DatabaseCategory[] = [
     ],
   },
   {
-    category: 'In-Memory',
+    category: 'In-Memory / Cache',
     items: [
       {
         id: 'redis',
@@ -70,10 +88,16 @@ const databases: DatabaseCategory[] = [
         description: 'Ultra-fast cache and session store',
         link: 'https://redis.io/docs/',
       },
+      {
+        id: 'memcached',
+        name: 'Memcached',
+        description: 'Simple distributed memory cache',
+        link: 'https://memcached.org/',
+      },
     ],
   },
   {
-    category: 'File / Embedded',
+    category: 'Embedded / Local',
     items: [
       {
         id: 'sqlite',
@@ -81,16 +105,11 @@ const databases: DatabaseCategory[] = [
         description: 'Lightweight database stored in a file',
         link: 'https://www.sqlite.org/docs.html',
       },
-    ],
-  },
-  {
-    category: 'Time-Series',
-    items: [
       {
-        id: 'influxdb',
-        name: 'InfluxDB',
-        description: 'Optimized for metrics and time-based data',
-        link: 'https://docs.influxdata.com/',
+        id: 'duckdb',
+        name: 'DuckDB',
+        description: 'In-process analytical database',
+        link: 'https://duckdb.org/docs/',
       },
     ],
   },
@@ -103,21 +122,67 @@ const databases: DatabaseCategory[] = [
         description: 'Relationship-based data (graphs)',
         link: 'https://neo4j.com/docs/',
       },
+      {
+        id: 'arangodb',
+        name: 'ArangoDB',
+        description: 'Multi-model database (documents, graphs, search)',
+        link: 'https://www.arangodb.com/docs/',
+      },
+    ],
+  },
+  {
+    category: 'Time-Series',
+    items: [
+      {
+        id: 'influxdb',
+        name: 'InfluxDB',
+        description: 'Optimized for metrics and time-based data',
+        link: 'https://docs.influxdata.com/',
+      },
+      {
+        id: 'timescaledb',
+        name: 'TimescaleDB',
+        description: 'PostgreSQL extension for time-series',
+        link: 'https://docs.timescale.com/',
+      },
+    ],
+  },
+  {
+    category: 'Search / Analytics',
+    items: [
+      {
+        id: 'elasticsearch',
+        name: 'Elasticsearch',
+        description: 'Search and analytics engine',
+        link: 'https://www.elastic.co/guide/',
+      },
+      {
+        id: 'opensearch',
+        name: 'OpenSearch',
+        description: 'Open-source search and analytics',
+        link: 'https://opensearch.org/docs/',
+      },
     ],
   },
 ];
 
 const languages: Option[] = [
   {
+    id: 'typescript',
+    name: 'TypeScript',
+    description: 'JavaScript with type safety. Most popular for web.',
+    link: 'https://www.typescriptlang.org/docs/',
+  },
+  {
     id: 'javascript',
-    name: 'JavaScript / TypeScript',
-    description: 'Most popular for web. Runs everywhere.',
+    name: 'JavaScript',
+    description: 'The language of the web. Runs everywhere.',
     link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
   },
   {
     id: 'python',
     name: 'Python',
-    description: 'Easy to read, widely used for backend.',
+    description: 'Easy to read, widely used for backend and data.',
     link: 'https://docs.python.org/3/tutorial/',
   },
   {
@@ -132,6 +197,12 @@ const languages: Option[] = [
     description: 'Strongly typed, used in enterprise systems.',
     link: 'https://docs.oracle.com/javase/tutorial/',
   },
+  {
+    id: 'rust',
+    name: 'Rust',
+    description: 'Safe, fast language for performance-critical apps.',
+    link: 'https://doc.rust-lang.org/book/',
+  },
 ];
 
 const authentication: Option[] = [
@@ -142,16 +213,52 @@ const authentication: Option[] = [
     link: 'https://jwt.io/introduction',
   },
   {
+    id: 'paseto',
+    name: 'Paseto',
+    description: 'Modern alternative to JWT with simpler API.',
+    link: 'https://paseto.io/',
+  },
+  {
     id: 'oauth',
-    name: 'OAuth (Google, GitHub)',
-    description: 'Let users sign in with trusted accounts.',
+    name: 'OAuth 2.0',
+    description: 'Industry-standard for delegated access.',
     link: 'https://oauth.net/2/',
   },
   {
+    id: 'openid',
+    name: 'OpenID Connect',
+    description: 'Authentication layer built on OAuth 2.0.',
+    link: 'https://openid.net/connect/',
+  },
+  {
+    id: 'google-auth',
+    name: 'Google Auth',
+    description: 'Sign in with Google account.',
+    link: 'https://developers.google.com/identity',
+  },
+  {
+    id: 'github-auth',
+    name: 'GitHub Auth',
+    description: 'Sign in with GitHub account.',
+    link: 'https://docs.github.com/en/apps/oauth-apps',
+  },
+  {
     id: 'otp',
-    name: 'OTP / Magic Link',
-    description: 'Passwordless authentication via email/SMS.',
+    name: 'OTP (Email / SMS)',
+    description: 'Passwordless authentication via code.',
     link: 'https://auth0.com/docs/authenticate/passwordless',
+  },
+  {
+    id: 'magic-link',
+    name: 'Magic Link',
+    description: 'Passwordless authentication via email link.',
+    link: 'https://magic.link/what-is-magic-link',
+  },
+  {
+    id: 'webauthn',
+    name: 'WebAuthn (Passkeys)',
+    description: 'Biometric and hardware security keys.',
+    link: 'https://webauthn.guide/',
   },
   {
     id: 'firebase-auth',
@@ -164,6 +271,24 @@ const authentication: Option[] = [
     name: 'Supabase Auth',
     description: 'Auth built into Supabase (PostgreSQL-based).',
     link: 'https://supabase.com/docs/guides/auth',
+  },
+  {
+    id: 'auth0',
+    name: 'Auth0',
+    description: 'Comprehensive authentication and identity platform.',
+    link: 'https://auth0.com/docs',
+  },
+  {
+    id: 'clerk',
+    name: 'Clerk',
+    description: 'Modern auth platform for developers.',
+    link: 'https://clerk.com/docs',
+  },
+  {
+    id: 'keycloak',
+    name: 'Keycloak',
+    description: 'Open-source identity and access management.',
+    link: 'https://www.keycloak.org/documentation',
   },
 ];
 
@@ -181,6 +306,18 @@ const backends: Option[] = [
     link: 'https://docs.djangoproject.com/',
   },
   {
+    id: 'fastapi',
+    name: 'FastAPI',
+    description: 'Modern Python backend with automatic API docs.',
+    link: 'https://fastapi.tiangolo.com/',
+  },
+  {
+    id: 'springboot',
+    name: 'Spring Boot',
+    description: 'Java-based framework for production apps.',
+    link: 'https://spring.io/projects/spring-boot',
+  },
+  {
     id: 'firebase',
     name: 'Firebase',
     description: "Google's backend platform with auth, database, and hosting.",
@@ -191,6 +328,18 @@ const backends: Option[] = [
     name: 'Supabase',
     description: 'Open-source Firebase alternative built on PostgreSQL.',
     link: 'https://supabase.com/docs',
+  },
+  {
+    id: 'appwrite',
+    name: 'Appwrite',
+    description: 'Open-source backend-as-a-service platform.',
+    link: 'https://appwrite.io/docs',
+  },
+  {
+    id: 'pocketbase',
+    name: 'PocketBase',
+    description: 'Self-hostable backend with built-in admin UI.',
+    link: 'https://pocketbase.io/docs',
   },
 ];
 
@@ -209,6 +358,9 @@ export default function OnboardingPlatform() {
       setSelectedDatabase('firestore');
     } else if (backendId === 'supabase') {
       setSelectedDatabase('postgres');
+    } else if (backendId === 'appwrite' || backendId === 'pocketbase') {
+      // AppWrite and PocketBase use internal databases but can work with various storage
+      setSelectedDatabase('postgres');
     }
   };
 
@@ -221,6 +373,10 @@ export default function OnboardingPlatform() {
     } else if (authId === 'supabase-auth' && !selectedBackend) {
       setSelectedBackend('supabase');
       setSelectedDatabase('postgres');
+    } else if (authId === 'clerk' && !selectedBackend) {
+      setSelectedBackend('nodejs-express');
+    } else if (authId === 'auth0' && !selectedBackend) {
+      setSelectedBackend('nodejs-express');
     }
   };
 
@@ -317,7 +473,9 @@ export default function OnboardingPlatform() {
                         onSelect={() => setSelectedDatabase(db.id)}
                         disabled={
                           (selectedBackend === 'firebase' && db.id !== 'firestore') ||
-                          (selectedBackend === 'supabase' && db.id !== 'postgres')
+                          (selectedBackend === 'supabase' && db.id !== 'postgres') ||
+                          (selectedBackend === 'appwrite' && db.id !== 'postgres') ||
+                          (selectedBackend === 'pocketbase' && db.id !== 'postgres')
                         }
                       />
                     ))}

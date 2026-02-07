@@ -36,6 +36,7 @@ export default function CommandOutput({
         python: 'Python',
         go: 'Go',
         java: 'Java',
+        rust: 'Rust',
       };
       return langMap[langId] || 'JavaScript';
     };
@@ -44,8 +45,12 @@ export default function CommandOutput({
       const backendMap: Record<string, string> = {
         'nodejs-express': 'Node.js Express',
         django: 'Django',
+        fastapi: 'FastAPI',
+        springboot: 'Spring Boot',
         firebase: 'Firebase',
         supabase: 'Supabase',
+        appwrite: 'Appwrite',
+        pocketbase: 'PocketBase',
       };
       return backendMap[backendId] || 'Node.js Express';
     };
@@ -54,13 +59,22 @@ export default function CommandOutput({
       const dbMap: Record<string, string> = {
         postgres: 'PostgreSQL',
         mysql: 'MySQL',
+        mariadb: 'MariaDB',
+        oracle: 'Oracle',
         mongodb: 'MongoDB',
+        couchdb: 'CouchDB',
         dynamodb: 'DynamoDB',
         firestore: 'Firestore',
         redis: 'Redis',
+        memcached: 'Memcached',
         sqlite: 'SQLite',
-        influxdb: 'InfluxDB',
+        duckdb: 'DuckDB',
         neo4j: 'Neo4j',
+        arangodb: 'ArangoDB',
+        influxdb: 'InfluxDB',
+        timescaledb: 'TimescaleDB',
+        elasticsearch: 'Elasticsearch',
+        opensearch: 'OpenSearch',
       };
       return dbMap[dbId] || 'PostgreSQL';
     };
@@ -68,10 +82,19 @@ export default function CommandOutput({
     const getAuthName = (authId: string) => {
       const authMap: Record<string, string> = {
         jwt: 'JWT',
-        oauth: 'OAuth',
+        paseto: 'Paseto',
+        oauth: 'OAuth 2.0',
+        openid: 'OpenID Connect',
+        'google-auth': 'Google Auth',
+        'github-auth': 'GitHub Auth',
         otp: 'OTP',
+        'magic-link': 'Magic Link',
+        webauthn: 'WebAuthn',
         'firebase-auth': 'Firebase Auth',
         'supabase-auth': 'Supabase Auth',
+        auth0: 'Auth0',
+        clerk: 'Clerk',
+        keycloak: 'Keycloak',
       };
       return authMap[authId] || 'JWT';
     };
@@ -102,17 +125,41 @@ export default function CommandOutput({
                   `echo "NEXT_PUBLIC_SUPABASE_URL=your_url" > .env.local`,
                   `echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key" >> .env.local`,
                 ]
-              : backend === 'nodejs-express'
+              : backend === 'appwrite'
                 ? [
-                    `npm install express cors dotenv`,
-                    `mkdir -p server && cd server`,
-                    `npm init -y && npm install express`,
+                    `npm install appwrite`,
+                    `echo "NEXT_PUBLIC_APPWRITE_ENDPOINT=your_endpoint" > .env.local`,
+                    `echo "NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_project_id" >> .env.local`,
                   ]
-                : [
-                    `pip install django djangorestframework`,
-                    `django-admin startproject myproject`,
-                    `cd myproject && python manage.py startapp api`,
-                  ],
+                : backend === 'pocketbase'
+                  ? [
+                      `# Download PocketBase from https://pocketbase.io/`,
+                      `./pocketbase serve`,
+                      `npm install pocketbase`,
+                    ]
+                  : backend === 'django'
+                    ? [
+                        `pip install django djangorestframework python-dotenv`,
+                        `django-admin startproject myproject`,
+                        `cd myproject && python manage.py startapp api`,
+                      ]
+                    : backend === 'fastapi'
+                      ? [
+                          `pip install fastapi uvicorn python-dotenv`,
+                          `touch main.py`,
+                          `uvicorn main:app --reload`,
+                        ]
+                      : backend === 'springboot'
+                        ? [
+                            `# Use Spring Initializr: https://start.spring.io/`,
+                            `# Or: spring boot cli new myapp --from-bing=web`,
+                            `gradle build`,
+                          ]
+                        : [
+                            `npm install express cors dotenv`,
+                            `mkdir -p server && cd server`,
+                            `npm init -y && npm install express`,
+                          ],
       },
       {
         id: 'database',
@@ -124,25 +171,60 @@ export default function CommandOutput({
                 `# Set up PostgreSQL connection in .env`,
                 `echo "DATABASE_URL=postgresql://user:pass@localhost/dbname" >> .env.local`,
               ]
-            : database === 'mongodb'
+            : database === 'mysql' || database === 'mariadb'
               ? [
-                  `npm install mongodb`,
-                  `echo "MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname" >> .env.local`,
+                  `npm install mysql2`,
+                  `echo "DATABASE_URL=mysql://user:pass@localhost/dbname" >> .env.local`,
                 ]
-              : database === 'sqlite'
+              : database === 'mongodb' || database === 'couchdb'
                 ? [
-                    `npm install better-sqlite3`,
-                    `touch database.db`,
+                    `npm install mongodb`,
+                    `echo "MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname" >> .env.local`,
                   ]
-                : database === 'firestore'
+                : database === 'sqlite' || database === 'duckdb'
                   ? [
-                      `# Firestore is included with Firebase`,
-                      `npm install firebase`,
+                      `npm install better-sqlite3`,
+                      `touch database.db`,
                     ]
-                  : [
-                      `npm install ${getDbName(database).toLowerCase()}`,
-                      `# Follow driver setup for ${getDbName(database)}`,
-                    ],
+                  : database === 'firestore'
+                    ? [
+                        `# Firestore is included with Firebase`,
+                        `npm install firebase`,
+                      ]
+                    : database === 'redis' || database === 'memcached'
+                      ? [
+                          `npm install ${database === 'redis' ? 'redis' : 'memcached'}`,
+                          `# Configure cache connection in your backend`,
+                        ]
+                      : database === 'neo4j' || database === 'arangodb'
+                        ? [
+                            `npm install ${database === 'neo4j' ? 'neo4j' : 'arangojs'}`,
+                            `# Follow ${getDbName(database)} setup guide`,
+                          ]
+                        : database === 'elasticsearch' || database === 'opensearch'
+                          ? [
+                              `npm install @elastic/elasticsearch`,
+                              `# Install and start ${getDbName(database)} locally or use cloud`,
+                            ]
+                          : database === 'timescaledb' || database === 'influxdb'
+                            ? [
+                                `npm install pg`,
+                                `# ${getDbName(database)} runs on ${database === 'timescaledb' ? 'PostgreSQL' : 'InfluxDB'} protocol`,
+                              ]
+                            : database === 'oracle'
+                              ? [
+                                  `npm install oracledb`,
+                                  `# Configure Oracle connection string`,
+                                ]
+                              : database === 'dynamodb'
+                                ? [
+                                    `npm install @aws-sdk/client-dynamodb`,
+                                    `# Configure AWS credentials`,
+                                  ]
+                                : [
+                                    `npm install ${getDbName(database).toLowerCase()}`,
+                                    `# Follow driver setup for ${getDbName(database)}`,
+                                  ],
       },
       {
         id: 'auth',
@@ -154,25 +236,68 @@ export default function CommandOutput({
                 `touch lib/auth.ts`,
                 `# Implement JWT middleware in your backend`,
               ]
-            : auth === 'oauth'
+            : auth === 'paseto'
               ? [
-                  `npm install next-auth`,
-                  `# Follow NextAuth.js setup at https://next-auth.js.org`,
+                  `npm install paseto`,
+                  `touch lib/paseto-auth.ts`,
+                  `# Implement Paseto token management`,
                 ]
-              : auth === 'firebase-auth'
+              : auth === 'oauth' || auth === 'google-auth' || auth === 'github-auth'
                 ? [
-                    `npm install firebase`,
-                    `# Firebase Auth is ready to use with your backend`,
+                    `npm install next-auth`,
+                    `# Follow NextAuth.js setup at https://next-auth.js.org`,
+                    `# Add providers for Google/GitHub`,
                   ]
-                : auth === 'supabase-auth'
+                : auth === 'openid'
                   ? [
-                      `npm install @supabase/supabase-js`,
-                      `# Supabase Auth is included with Supabase client`,
+                      `npm install openid-client`,
+                      `# Configure OpenID Connect provider`,
                     ]
-                  : [
-                      `npm install otp-generator`,
-                      `# Implement OTP logic in your backend`,
-                    ],
+                  : auth === 'otp'
+                    ? [
+                        `npm install otp-generator nodemailer`,
+                        `# Implement OTP generation and SMS/email`,
+                      ]
+                    : auth === 'magic-link'
+                      ? [
+                          `npm install jsonwebtoken nodemailer`,
+                          `# Implement magic link generation and delivery`,
+                        ]
+                      : auth === 'webauthn'
+                        ? [
+                            `npm install @simplewebauthn/server @simplewebauthn/browser`,
+                            `# Implement WebAuthn/Passkey authentication`,
+                          ]
+                        : auth === 'firebase-auth'
+                          ? [
+                              `npm install firebase`,
+                              `# Firebase Auth is ready to use with your backend`,
+                            ]
+                          : auth === 'supabase-auth'
+                            ? [
+                                `npm install @supabase/supabase-js`,
+                                `# Supabase Auth is included with Supabase client`,
+                              ]
+                            : auth === 'auth0'
+                              ? [
+                                  `npm install auth0`,
+                                  `# Configure Auth0 tenant and API`,
+                                  `# Follow: https://auth0.com/docs`,
+                                ]
+                              : auth === 'clerk'
+                                ? [
+                                    `npm install @clerk/nextjs`,
+                                    `# Follow Clerk setup: https://clerk.com/docs`,
+                                  ]
+                                : auth === 'keycloak'
+                                  ? [
+                                      `npm install keycloak-js`,
+                                      `# Deploy and configure Keycloak server`,
+                                    ]
+                                  : [
+                                      `npm install otp-generator`,
+                                      `# Implement OTP logic in your backend`,
+                                    ],
       },
     ];
   };
